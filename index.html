@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Assessoria Inteligente</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- ========== SIDEBAR AZUL ========== -->
+  <aside class="sidebar">
+    <h1>ASSESSORIA<br>INTELIGENTE</h1>
+    <button id="btnAnexar">📁 Anexar Planilha</button>
+    <button id="btnExcluir">🗑️ Excluir Planilha</button>
+    <button id="btnEnviar" disabled>✉️ Enviar Convites</button>
+    <button id="btnExportExcel">📊 Exportar Excel</button>
+    <button id="btnExportPDF">📄 Exportar PDF</button>
+    <button id="btnExportWord">📝 Exportar Word</button>
+  </aside>
+
+  <!-- ========== ÁREA PRINCIPAL ========== -->
+  <main>
+    <div id="nome-arquivo"></div>
+    <div id="tabela-lista"></div>
+    <div id="qr"></div>
+    <div id="checkin"></div>
+    <input type="file" id="file-input" accept=".xlsx" style="display:none" />
+  </main>
+
+    <!-- carregamento de libs, logo antes de config.js e script.js -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

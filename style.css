@@ -1,0 +1,34 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+/* sidebar fixa à esquerda, azul e com botões verticais */
+.sidebar {
+  background-color: #007bff;
+  color: #fff;
+  width: 220px;
+  height: 100vh;
+  padding: 20px;
+  position: fixed;
+}
+
+.sidebar h1 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+
+.sidebar button {
+  width: 100%;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* conteúdo principal deslocado para a direita */
+main {
+  margin-left: 240px; /* 220px da sidebar + 20px de gap */
+  padding: 20px;
+}
