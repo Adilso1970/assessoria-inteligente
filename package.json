@@ -5,10 +5,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-"dependencies": {
-    "node-fetch": "^2.7.0"
-  }
-}
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Adilso1970/assessoria-inteligente.git"
@@ -20,7 +16,6 @@
     "url": "https://github.com/Adilso1970/assessoria-inteligente/issues"
   },
   "homepage": "https://github.com/Adilso1970/assessoria-inteligente#readme",
-  "description": "",
   "dependencies": {
     "node-fetch": "^2.7.0"
   }
