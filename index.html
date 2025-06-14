@@ -9,15 +9,16 @@
   <div id="sidebar">
     <h1>ASSESSORIA<br>INTELIGENTE</h1>
     <button id="btnAnexar">📁 Anexar Planilha</button>
-    <button id="btnExcluir">🗑️ Excluir Planilha</button>
-    <button id="btnEnviarConvites">✉️ Enviar Convites</button>
-    <button id="btnExportExcel">📊 Exportar Excel</button>
-    <button id="btnExportPDF">📄 Exportar PDF</button>
-    <button id="btnExportWord">📝 Exportar Word</button>
+    <button id="btnExcluir" disabled>🗑️ Excluir Planilha</button>
+    <button id="btnEnviarConvites" disabled>✉️ Enviar Convites</button>
+    <button id="btnExportExcel" disabled>📊 Exportar Excel</button>
+    <button id="btnExportPDF" disabled>📄 Exportar PDF</button>
+    <button id="btnExportWord" disabled>📝 Exportar Word</button>
   </div>
-  <main id="main">
-    <!-- Área onde a planilha e QR codes aparecem -->
-  </main>
+  <main id="main"></main>
+  <!-- input escondido para fallback de upload -->
+  <input type="file" id="fileInput" accept=".xlsx" style="display:none" />
+  <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
