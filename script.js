@@ -1,82 +1,66 @@
-// script.js
-const btnAnexar       = document.getElementById('btnAnexar');
-const btnExcluir      = document.getElementById('btnExcluir');
-const btnEnviarConvites = document.getElementById('btnEnviarConvites');
-const btnExportExcel  = document.getElementById('btnExportExcel');
-const btnExportPDF    = document.getElementById('btnExportPDF');
-const btnExportWord   = document.getElementById('btnExportWord');
-const fileInput       = document.getElementById('fileInput');
-const main            = document.getElementById('main');
+(async () => {
+  const fileInput = document.getElementById('file-input');
+  const btnAnexar = document.getElementById('btnAnexar');
+  const btnExcluir = document.getElementById('btnExcluir');
+  const btnEnviar = document.getElementById('btnEnviar');
+  const nomeArquivo = document.getElementById('nome-arquivo');
+  const tabelaLista = document.getElementById('tabela-lista');
+  let convidados = [];
 
-let workbook, worksheet, data;
+  btnAnexar.onclick = () => fileInput.click();
+  fileInput.onchange = async (e) => {
+    const [file] = e.target.files;
+    nomeArquivo.textContent = file.name;
+    const data = await file.arrayBuffer();
+    const wb = XLSX.read(data);
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    convidados = XLSX.utils
+      .sheet_to_json(ws, { header: 1 })
+      .slice(1)
+      .map(row => ({ nome: row[0], telefone: row[1], mesa: row[2] }));
+    renderTabela();
+    btnEnviar.disabled = false;
+  };
 
-// Quando clicam em “Anexar Planilha”, disparamos o input[type=file]
-btnAnexar.addEventListener('click', () => {
-  fileInput.click();
-});
+  btnExcluir.onclick = () => {
+    convidados = [];
+    nomeArquivo.textContent = '';
+    tabelaLista.innerHTML = '';
+    btnEnviar.disabled = true;
+    document.getElementById('qr').innerHTML = '';
+    document.getElementById('checkin').innerHTML = '';
+  };
 
-// Quando o usuário escolhe o arquivo, lemos e processamos
-fileInput.addEventListener('change', async (evt) => {
-  const file = evt.target.files[0];
-  if (!file) return;
-  const arrayBuffer = await file.arrayBuffer();
-  workbook = XLSX.read(arrayBuffer);
-  worksheet = workbook.Sheets[workbook.SheetNames[0]];
-  data = XLSX.utils.sheet_to_json(worksheet);
-  renderizarPlanilha();
-  // habilita os botões agora que temos dados
-  btnExcluir.disabled      = false;
-  btnEnviarConvites.disabled = false;
-  btnExportExcel.disabled  = false;
-  btnExportPDF.disabled    = false;
-  btnExportWord.disabled   = false;
-});
+  function renderTabela() {
+    let html = '<table><tr><th>Nome</th><th>Fone</th><th>Mesa</th></tr>';
+    convidados.forEach(c => {
+      html += <tr><td></td><td></td><td></td></tr>;
+    });
+    html += '</table>';
+    tabelaLista.innerHTML = html;
+  }
 
-// “Excluir Planilha” volta ao estado inicial
-btnExcluir.addEventListener('click', () => {
-  workbook = worksheet = data = null;
-  main.innerHTML = '';
-  fileInput.value = ''; // limpa o input também
-  btnExcluir.disabled      = true;
-  btnEnviarConvites.disabled = true;
-  btnExportExcel.disabled  = true;
-  btnExportPDF.disabled    = true;
-  btnExportWord.disabled   = true;
-});
+  btnEnviar.onclick = async () => {
+    const inst = prompt('Inst�ncia Z-API (ex: ABC12345):');
+    const token = prompt('Token Z-API:');
+    if (!inst || !token) return alert('Inst�ncia e token obrigat�rios.');
 
-// “Enviar Convites” só exibe um alerta (CLI é separado)
-btnEnviarConvites.addEventListener('click', () => {
-  alert('Para enviar realmente use o CLI: run_send_invites.bat Convidados.xlsx');
-});
-
-// Exportar Excel pela SheetJS
-btnExportExcel.addEventListener('click', () => {
-  const wb2 = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb2, worksheet, 'Convidados');
-  XLSX.writeFile(wb2, 'export.xlsx');
-});
-
-// Esses dois são exemplos de “mock”
-btnExportPDF.addEventListener('click', () => {
-  const p = document.createElement('p');
-  p.textContent = '(PDF gerado)';
-  main.appendChild(p);
-});
-btnExportWord.addEventListener('click', () => {
-  const p = document.createElement('p');
-  p.textContent = '(Word gerado)';
-  main.appendChild(p);
-});
-
-// Função que renderiza a lista na área principal
-function renderizarPlanilha() {
-  main.innerHTML = '';
-  if (!data) return;
-  const ul = document.createElement('ul');
-  data.forEach(row => {
-    const li = document.createElement('li');
-    li.textContent = row['Nome do Convidado (a)'] || '(sem nome)';
-    ul.appendChild(li);
-  });
-  main.appendChild(ul);
-}
+    try {
+      const resp = await fetch('/.netlify/functions/send-invites', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ inst, token, convidados })
+      });
+      const json = await resp.json();
+      console.log('Resposta Function:', json);
+      if (json.failures?.length) {
+        alert('Falha nos convites:\n' + json.failures.join('\n'));
+      } else {
+        alert('Convites enviados com sucesso!');
+      }
+    } catch (err) {
+      console.error('Erro na chamada:', err);
+      alert('Erro interno ao enviar. Veja console.');
+    }
+  };
+})();
