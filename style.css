@@ -1,34 +1,43 @@
+/* Reset básico */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* Layout */
 body {
-  margin: 0;
+  display: flex;
   font-family: Arial, sans-serif;
-}
-
-/* sidebar fixa à esquerda, azul e com botões verticais */
-.sidebar {
-  background-color: #007bff;
-  color: #fff;
-  width: 220px;
   height: 100vh;
-  padding: 20px;
-  position: fixed;
 }
-
-.sidebar h1 {
+#sidebar {
+  width: 200px;
+  background: #0058a3;
+  color: white;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+#sidebar h1 {
+  text-align: center;
+  margin-bottom: 1rem;
   font-size: 1.5rem;
-  margin-bottom: 1.5rem;
   line-height: 1.2;
 }
-
-.sidebar button {
-  width: 100%;
-  margin-bottom: 0.5rem;
+#sidebar button {
+  background: white;
+  color: black;
+  border: none;
   padding: 0.5rem;
-  font-size: 1rem;
+  margin: 0.5rem 0;
+  text-align: left;
   cursor: pointer;
+  font-size: 0.9rem;
 }
-
-/* conteúdo principal deslocado para a direita */
-main {
-  margin-left: 240px; /* 220px da sidebar + 20px de gap */
-  padding: 20px;
+#sidebar button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+#main {
+  flex: 1;
+  padding: 1rem;
+  overflow: auto;
 }

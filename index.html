@@ -1,27 +1,23 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
   <title>Assessoria Inteligente</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="sidebar" style="background-color:#0052cc; width:240px; height:100vh; position:fixed; top:0; left:0; padding:20px; box-sizing:border-box; color:white;">
-    <h1 style="font-size:1.5rem; margin-bottom:1.5rem;">ASSESSORIA<br>INTELIGENTE</h1>
-    <button id="btnAnexarPlanilha" class="sidebar-btn">📁 Anexar Planilha</button>
-    <button id="btnExcluirPlanilha" class="sidebar-btn">🗑️ Excluir Planilha</button>
-    <!-- <button id="btnEnviarConvites" class="sidebar-btn">✉️ disabled>Enviar Convites</button> -->
-    <button id="btnExportExcel" class="sidebar-btn">📊 Exportar Excel</button>
-    <button id="btnExportPDF" class="sidebar-btn">📄 Exportar PDF</button>
-    <button id="btnExportWord" class="sidebar-btn">📝 Exportar Word</button>
+  <div id="sidebar">
+    <h1>ASSESSORIA<br>INTELIGENTE</h1>
+    <button id="btnAnexar">📁 Anexar Planilha</button>
+    <button id="btnExcluir">🗑️ Excluir Planilha</button>
+    <button id="btnEnviarConvites">✉️ Enviar Convites</button>
+    <button id="btnExportExcel">📊 Exportar Excel</button>
+    <button id="btnExportPDF">📄 Exportar PDF</button>
+    <button id="btnExportWord">📝 Exportar Word</button>
   </div>
-
-  <div id="main" style="margin-left:260px; padding:20px;">
-    <!-- Aqui irá o conteúdo dinâmico: nome dos convidados, QR codes, estatísticas, etc. -->
-  </div>
-
-  <!-- Mantém apenas o script principal sem handler de envio pelo navegador -->
-  <script src="index.js"></script>
+  <main id="main">
+    <!-- Área onde a planilha e QR codes aparecem -->
+  </main>
+  <script src="script.js"></script>
 </body>
 </html>
