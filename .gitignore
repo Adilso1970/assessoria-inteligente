@@ -3,3 +3,9 @@
 ".netlify/" 
 ".netlify/" 
 ".netlify/" 
+
+node_modules/
+.env
+.env.example
+*.xlsx
+*.zip

@@ -1,55 +1,83 @@
-import axios from 'axios';
-import XLSX from 'xlsx';
-import dotenv from 'dotenv';
-dotenv.config();
+// sendInvites.js
+// CommonJS style — funciona direto com `node sendInvites.js`
 
-const [,, file] = process.argv;
-if (!file) return console.error('❌ Use: node sendInvites.js <planilha.xlsx>');
+const XLSX = require('xlsx')
+const axios = require('axios')
+require('dotenv').config()
 
-const { ZAPI_INSTANCE_ID: INSTANCE, ZAPI_TOKEN: TOKEN, ZAPI_CLIENT_TOKEN: CLIENT_TOKEN } = process.env;
-if (!INSTANCE || !TOKEN || !CLIENT_TOKEN) {
-  return console.error('❌ Defina ZAPI_INSTANCE_ID, ZAPI_TOKEN e ZAPI_CLIENT_TOKEN no seu .env');
+// --- pega o nome do arquivo da linha de comando
+const file = process.argv[2]
+if (!file) {
+  console.error('❌ Use: node sendInvites.js <planilha.xlsx>')
+  process.exit(1)
 }
 
+// --- checa vars de ambiente
+const { ZAPI_INSTANCE_ID: INSTANCE, ZAPI_TOKEN: TOKEN, ZAPI_CLIENT_TOKEN: CLIENT_TOKEN } = process.env
+if (!INSTANCE || !TOKEN || !CLIENT_TOKEN) {
+  console.error('❌ Defina ZAPI_INSTANCE_ID, ZAPI_TOKEN e ZAPI_CLIENT_TOKEN no seu .env')
+  process.exit(1)
+}
+
+let workbook
+try {
+  workbook = XLSX.readFile(file)
+} catch (err) {
+  console.error(`❌ Erro ao ler a planilha: ${err.message}`)
+  process.exit(1)
+}
+
+// converte a primeira aba em JSON
+const sheetName = workbook.SheetNames[0]
+const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 })
+
+// cabeçalho esperado na primeira linha:
+const header = rows.shift()
+const idxName  = header.indexOf('Nome do Convidado (a)')
+const idxPhone = header.indexOf('Número WhatsApp')
+// (ajuste esses nomes se você tiver usado outro)
+
+// monta array de objetos { name, phone, ... }
+const data = rows.map(r => ({
+  name: r[idxName],
+  rawPhone: r[idxPhone]
+})).filter(r => r.name && r.rawPhone)
+
+console.log(`➡️ Total de registros na planilha: ${data.length}`)
+
 (async () => {
-  const wb = XLSX.readFile(file);
-  const sheet = wb.Sheets[wb.SheetNames[0]];
-  const data = XLSX.utils.sheet_to_json(sheet);
-  console.log(`➡️ Total de registros na planilha: ${data.length}`);
+  const failures = []
 
-  const failures = [];
-  for (const row of data) {
-    const name = row['Nome do Convidado (a)'];
-    const phoneRaw = String(row['Número WhatsApp'] || '').replace(/\D/g, '');
-    if (!phoneRaw) {
-      console.warn(`⚠️ Telefone ausente para "${name}". Pulando.`);
-      continue;
-    }
-    const raw = phoneRaw.startsWith('55') ? phoneRaw : `55${phoneRaw}`;
-    const message = row['Texto do Convite'] ||
-      `Olá ${name}, você está convidado(a)!`;
+  for (const { name, rawPhone } of data) {
+    // normaliza telefone
+    const raw = String(rawPhone).replace(/\D/g, '')
+    const phone = raw.startsWith('55') ? raw : '55' + raw
 
-    console.log(`📱 Payload => raw: "${raw}", phone: "${raw}", message: "${message}"`);
+    const message = `Olá ${name}, você está convidado(a)!`
+
+    console.log(`📱 Enviando para ${name}: ${phone}`)
     try {
       const res = await axios.post(
         `https://api.z-api.io/instances/${INSTANCE}/send-text`,
-        { phone: raw, message },
+        { phone, message },
         { headers: { 'Client-Token': CLIENT_TOKEN, 'Content-Type': 'application/json' } }
-      );
-      if (res.data.success) {
-        console.log(`✅ Enviado para ${name} (messageId: ${res.data.id})`);
+      )
+      if (res.data?.success) {
+        console.log(`✅ Enviado para ${name}`)
       } else {
-        throw res.data;
+        console.error(`❌ Falha para ${name}:`, res.data)
+        failures.push(name)
       }
     } catch (err) {
-      const status = err.response?.status || err.error || 'ERROR';
-      const body = err.response?.data || err;
-      console.error(`❌ Falha para ${name}: ${status} –`, body);
-      failures.push(name);
+      console.error(`❌ Erro ao enviar para ${name}:`, err.response?.data || err.message)
+      failures.push(name)
     }
   }
 
   if (failures.length) {
-    console.error(`\n❗ Convites falharam para: ${failures.join(', ')}`);
+    console.error(`\n❗ Convites falharam para: ${failures.join(', ')}`)
+    process.exit(1)
+  } else {
+    console.log('\n🎉 Todos os convites enviados com sucesso!')
   }
-})();
+})()
